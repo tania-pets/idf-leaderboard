@@ -2,7 +2,7 @@
 /**
  * Trait used to create a fresh db on every test and seed any given seeders
  */
-namespace Tests;
+namespace Tests\Traits;
 
 
 Trait UseDatabase
@@ -18,4 +18,11 @@ Trait UseDatabase
         }
     }
 
+    /**
+     * Used often to create users
+     */
+    public function getRandomCountryId(): int
+    {
+        return \App\Country::all(['id'])->pluck('id')->random();
+    }
 }

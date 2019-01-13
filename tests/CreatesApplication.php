@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Illuminate\Contracts\Console\Kernel;
-
+use Tests\Traits\{UseDatabase, UseRedis};
 trait CreatesApplication
 {
     /**
@@ -22,6 +22,11 @@ trait CreatesApplication
         //create the test database with countries seeded
         if (isset($uses[UseDatabase::class])) {
             $this->createDatabase(true, ['\CountriesSeeder']);
+        }
+        if (isset($uses[UseRedis::class])) {
+            $this->beforeApplicationDestroyed(function () {
+                $this->flushDb();
+            });
         }
 
         return $app;

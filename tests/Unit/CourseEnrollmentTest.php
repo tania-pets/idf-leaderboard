@@ -3,8 +3,8 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
-use Tests\UseDatabase;
-use App\{Course, Lesson, Quiz, User, Country, CourseEnrollment, QuizAnswer};
+use Tests\Traits\UseDatabase;
+use App\{Course, Lesson, Quiz, User, CourseEnrollment, QuizAnswer};
 
 
 class CourseEnrollmentTest extends TestCase
@@ -66,11 +66,5 @@ class CourseEnrollmentTest extends TestCase
          $user->quizAnswers()->delete();
          $this->assertEquals($enrollment->calculateScore(), 0);
 
-    }
-
-
-    private function getRandomCountryId(): int
-    {
-        return Country::all(['id'])->pluck('id')->random();
     }
 }
