@@ -13,6 +13,7 @@ Class LeaderBoardEngine
 {
     private $lb_storage;
 
+    const LEADERBOARD_TYPES = ['country', 'global'];
     /**
      * For flexibility purpose, the class accepts LeaderBoardStorageInterface object
      * Right now it's on redis but it can easily be implemented with different storage
@@ -61,9 +62,17 @@ Class LeaderBoardEngine
         $myScore = $leadersAndLoosers[$userId];
         $this->moveMeUpperFromEquals($leadersAndLoosers, $myScore, $userId);
 
-        return $leadersAndLoosers;
+        return $this->withRanks($leadersAndLoosers);
     }
 
+    private function withRanks($leadersAndLoosers)
+    {
+        foreach ($leadersAndLoosers as $userId => $score)
+        {
+            $leadersAndLoosers[$userId] = ['score' => $score, 'rank' => $this->lb_storage->getRank($userId) + 1];
+        }
+        return $leadersAndLoosers;
+    }
 
     /**
      * If same score with other users, i must be shown upper
@@ -96,6 +105,24 @@ Class LeaderBoardEngine
     public static function getConf(string $key)
     {
         return Config('leaderboard.' . $key);
+    }
+
+    /**
+     * Add ordinal suffix to rank
+     * https://en.wikipedia.org/wiki/English_numerals#Ordinal_numbers
+     * @paran int $rank
+     * @return string
+     */
+    public static function withOrdinalSuffix(int $rank) : string
+    {
+        $ends = array('th','st','nd','rd','th','th','th','th','th','th');
+        if (($rank %100) >= 11 && ($rank%100) <= 13) {
+            $abbreviation = $rank. 'th';
+        }
+        else {
+            $abbreviation = $rank. $ends[$rank % 10];
+        }
+        return $abbreviation;
     }
 
 

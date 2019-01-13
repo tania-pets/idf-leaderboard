@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Course;
-use App\CourseEnrollment;
+use App\{Course, CourseEnrollment, User};
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Response;
+use App\LeaderBoard\{LeaderBoardFactory, LeaderBoardEngine};
+
 
 class CourseEnrollmentController extends Controller
 {
@@ -26,7 +27,21 @@ class CourseEnrollmentController extends Controller
             return view('courses.show', ['course' => $course]);
         }
 
-        return view('courseEnrollments.show', ['enrollment' => $enrollment]);
+        $time_start = microtime(true);
+
+        $leaderBoardTypes = LeaderBoardEngine::LEADERBOARD_TYPES; //country, global
+        $allUsersInLeaderBoard = [];
+        foreach ($leaderBoardTypes as $lbType) {
+            $leaderBoard = LeaderBoardFactory::makeLeaderBoard(auth()->user(), $course, $lbType);
+            $leaderBoardList = $leaderBoard->getLeaderBoardList();
+            $leaderBoardLists[$lbType] = $leaderBoardList;
+            $allUsersInLeaderBoard+=$leaderBoardList;
+        }
+        //fetch user data for leaderboard to display names
+        $leaderBoardUserData = User::whereIn('id', array_keys($allUsersInLeaderBoard))->get()->groupBy('id');
+        echo 'Total execution time in seconds: ' . (microtime(true) - $time_start);
+
+        return view('courseEnrollments.show', ['me' => auth()->user(), 'enrollment' => $enrollment, 'leaderBoardLists' =>$leaderBoardLists, 'leaderBoardUserData' => $leaderBoardUserData ]);
     }
 
     public function store(string $slug)
