@@ -42,7 +42,7 @@
                                     <ul style="padding: 0px;">
 
                                     @foreach ($lbUsers as $lbUserId => $lbInfo)
-                                        <?php if((isset($prevRank) &&  $lbInfo['rank'] - $prevRank > 1) ||  ( isset($prevRank) && ($lbInfo['rank'] - $prevRank ==1) &&  $lbInfo['rank'] == 4))
+                                        <?php if((isset($prevRank) &&  $lbInfo['rank'] - $prevRank > 1) ||  ( isset($prevRank) && ($lbInfo['rank'] - $prevRank ==1) &&  $lbInfo['rank'] == \App\LeaderBoard\LeaderBoardEngine::getConf('leaders_shown') + 1))
                                             echo '<hr>';
                                         ?>
                                         <li class="courseRanking__rankItem"
