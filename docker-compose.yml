@@ -1,0 +1,77 @@
+version: '2'
+
+### Change the `project` with your own project name ###
+services:
+  code:
+    container_name: idf-code
+    image: debian
+    volumes:
+      - ./:/var/www/laravel
+
+  workspace:
+    container_name: idf-workspace
+    restart: always
+    image: framgia/laravel-workspace
+    volumes_from:
+      - code
+    tty: true
+
+  php-fpm:
+    container_name: idf-php-fpm
+    restart: always
+    image: framgia/laravel-php-fpm
+    volumes_from:
+      - code
+    expose:
+      - "9000"
+    links:
+      - workspace
+
+  nginx:
+    container_name: idf-nginx
+    restart: always
+    image: framgia/laravel-nginx
+    volumes_from:
+      - data
+      - logs
+      - code
+    ports:
+      - "8880:80"
+    links:
+      - php-fpm
+
+  data:
+    container_name: idf-data
+    image: debian
+    volumes:
+      - .docker/mysql:/var/lib/mysql
+      - .docker/data:/data
+
+  data_test:
+    container_name: idf-data_test
+    image: debian
+    volumes:
+      - .docker/mysql_test:/var/lib/mysql
+      - .docker/data_test:/data
+
+  logs:
+    container_name: idf-logs
+    image: debian
+    volumes:
+      - .docker/logs/nginx:/var/log/nginx
+      - .docker/logs/mongodb:/var/log/mongodb
+
+  mysql:
+    container_name: idf-mysql
+    restart: always
+    image: mysql:5.7
+    volumes_from:
+      - data
+      - logs
+    ports:
+      - "${DB_PORT}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: "${DB_DATABASE}"
+      MYSQL_USER: "${DB_USERNAME}"
+      MYSQL_PASSWORD: "${DB_PASSWORD}"

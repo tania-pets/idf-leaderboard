@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!--
+    This is simply a file with some directory setting. This file is looking by phpcs
+    if no argument with another ruleset provided. Thus we can simply run 'phpcs'
+    and CS will use this configuration which extends "./.phpcs/ruleset.xml".
+    We are divided CS configuration into 2 files because PHPStorm can't use
+    this ruleset for inspections (it looking for the file with 'ruleset.xml' name).
+
+    @see https://github.com/squizlabs/PHP_CodeSniffer/wiki/Annotated-ruleset.xml
+    @see https://github.com/squizlabs/PHP_CodeSniffer/blob/3.0/src/Standards/PSR2/ruleset.xml
+
+    examples:
+    # check only one file
+    phpcs app/Models/Billing/Invoice.php
+
+    # check directory
+    phpcs app/Models/Billing
+
+
+    How to ignore single line: // phpcs:ignore
+    How to ignore single rule: // phpcs:ignore Squiz.Arrays.ArrayDeclaration.SingleLineNotAllowed
+
+    How to ignore lines:
+        // @codingStandardsIgnoreStart
+        $y0ur_uglyCode = array();
+        // @codingStandardsIgnoreEnd
+-->
+
+<ruleset name="IDF">
+    <description>Simplified IDF coding standard</description>
+    <arg name="extensions" value="php"/><!--CS can also check js, inc, lib file - omit them-->
+    <arg name="colors"/>
+    <arg name="report-width" value="120"/>
+
+    <file>./app</file>
+    <file>./bootstrap</file>
+    <exclude-pattern>./bootstrap/cache</exclude-pattern>
+    <file>./config</file>
+    <file>./database</file>
+    <file>./routes</file>
+    <file>./tests</file>
+
+
+    <rule ref="PSR1"/><!-- Code MUST follow all rules outlined in PSR-1. -->
+    <rule ref="PSR12">
+        <exclude name="PSR12.Operators.OperatorSpacing"/>
+    </rule>
+
+    <!-- migrations classes don't have a namespace -->
+    <rule ref="PSR1.Classes.ClassDeclaration.MissingNamespace">
+        <exclude-pattern>./database/*</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Classes.ClassFileName">
+        <exclude-pattern>./migrations*</exclude-pattern>
+    </rule>
+
+    <!--Tests should have minimal visual noise-->
+    <rule ref="Squiz.Scope.MethodScope.Missing">
+        <exclude-pattern>./tests*</exclude-pattern>
+    </rule>
+
+    <!--Snake_case improves readabiliuty of long names-->
+    <rule ref="PSR1.Methods.CamelCapsMethodName.NotCamelCaps">
+        <exclude-pattern>./tests*</exclude-pattern>
+    </rule>
+
+</ruleset>
