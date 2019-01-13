@@ -78,7 +78,7 @@ Class LeaderBoardEngine
      * If same score with other users, i must be shown upper
      * @return    void
      */
-    private function moveMeUpperFromEquals(&$leadersAndLoosers, $myScore, $userId)
+    private function moveMeUpperFromEquals(array &$leadersAndLoosers, string $myScore, int $userId) : void
     {
         $moveMeUp = function($k1, $k2) use ($myScore, $leadersAndLoosers, $userId) {
             $score1 = $leadersAndLoosers[$k1];

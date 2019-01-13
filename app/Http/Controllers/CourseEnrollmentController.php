@@ -27,8 +27,7 @@ class CourseEnrollmentController extends Controller
             return view('courses.show', ['course' => $course]);
         }
 
-        $time_start = microtime(true);
-
+        //Generate leaderBoard lists
         $leaderBoardTypes = LeaderBoardEngine::LEADERBOARD_TYPES; //country, global
         $allUsersInLeaderBoard = [];
         foreach ($leaderBoardTypes as $lbType) {
@@ -37,10 +36,9 @@ class CourseEnrollmentController extends Controller
             $leaderBoardLists[$lbType] = $leaderBoardList;
             $allUsersInLeaderBoard+=$leaderBoardList;
         }
-        //fetch user data for leaderboard to display names
+        //fetch user data from database to display names etc
         $leaderBoardUserData = User::whereIn('id', array_keys($allUsersInLeaderBoard))->get()->groupBy('id');
-        echo 'Total execution time in seconds: ' . (microtime(true) - $time_start);
-
+        
         return view('courseEnrollments.show', ['me' => auth()->user(), 'enrollment' => $enrollment, 'leaderBoardLists' =>$leaderBoardLists, 'leaderBoardUserData' => $leaderBoardUserData ]);
     }
 

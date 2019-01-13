@@ -35,11 +35,9 @@
                         <div class="row">
                             @foreach ($leaderBoardLists as $lbType => $lbUsers)
                                 <div class="col-md-6">
-                                    @if($lbType == 'country')
-                                        <h4>You are ranked <b>{{\App\LeaderBoard\LeaderBoardEngine::withOrdinalSuffix($lbUsers[$me->id]['rank'])}}</b> in {{ $me->country->name }}</h4>
-                                    @else
-                                        <h4>You are ranked <b>{{\App\LeaderBoard\LeaderBoardEngine::withOrdinalSuffix($lbUsers[$me->id]['rank'])}}</b> Worldwide</h4>
-                                    @endif
+                                    <h4>You are ranked <b>{{\App\LeaderBoard\LeaderBoardEngine::withOrdinalSuffix($lbUsers[$me->id]['rank'])}}</b>
+                                        {{ $lbType=='country' ? "in " .$me->country->name : 'Worldwide' }}
+                                    </h4>
 
                                     <ul style="padding: 0px;">
 
