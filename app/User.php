@@ -45,4 +45,9 @@ class User extends Authenticatable implements GraderInterface
     {
         return $this->hasMany(CourseEnrollment::class);
     }
+
+    public function quizAnswers(): HasMany
+    {
+        return $this->hasMany(QuizAnswer::class);
+    }
 }

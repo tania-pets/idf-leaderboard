@@ -62,5 +62,8 @@ class QuizAnswersSeeder extends Seeder
                 'score' => random_int(0, $quiz->max_score),
             ]);
         });
+
+        $enrollment->score = $enrollment->calculateScore();
+        $enrollment->save();
     }
 }

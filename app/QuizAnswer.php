@@ -42,4 +42,12 @@ final class QuizAnswer extends Model
 
         event(new QuizAnswerEvaluated($this, $score, $gradedBy));
     }
+
+    /**
+     * Scope for quiz
+     */
+    public function scopeOnQuiz(\Illuminate\Database\Eloquent\Builder $query, int $quizId)
+    {
+        $query->where('quiz_id', $quizId);
+    }
 }

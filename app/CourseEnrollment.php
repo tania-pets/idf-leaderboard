@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property int $course_id
+ * @property int $score
+
  *
  * @property Course $course
  * @property User $user
@@ -18,6 +20,7 @@ final class CourseEnrollment extends Model
     protected $fillable = [
         'user_id',
         'course_id',
+        'score'
     ];
 
     public function course(): BelongsTo
@@ -28,5 +31,19 @@ final class CourseEnrollment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Calculates the score that user has achieved in this enrollment's course quizzes in total
+     * @return    int
+     */
+    public function calculateScore(): int
+    {
+        $answersGiven = QuizAnswer::where('user_id', $this->user_id)->whereHas('quiz', function($q) {
+            $q->whereHas('lesson', function($l) {
+                $l->where('course_id', $this->course_id);
+            });
+        })->get();
+        return $answersGiven->count() ? $answersGiven->sum('score') : 0;
     }
 }
