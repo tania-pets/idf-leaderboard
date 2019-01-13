@@ -2,8 +2,8 @@
 
 namespace App\Events;
 
-use App\GraderInterface;
 use Illuminate\Queue\SerializesModels;
+use App\{QuizAnswer,GraderInterface};
 
 final class QuizAnswerEvaluated
 {
@@ -23,5 +23,10 @@ final class QuizAnswerEvaluated
         $this->quizAnswer = $quizAnswer;
         $this->score = $score;
         $this->grader = $grader;
+    }
+
+    public function getQuizAnswer()
+    {
+        return $this->quizAnswer;
     }
 }

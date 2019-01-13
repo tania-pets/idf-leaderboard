@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use Illuminate\Queue\SerializesModels;
+use App\{QuizAnswer,GraderInterface};
 
 final class QuizAnswerEvaluating
 {

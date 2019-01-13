@@ -1,8 +1,7 @@
 <?php declare(strict_types=1);
 
 namespace App;
-
-use App\Events\QuizAnswerEvaluating;
+use App\Events\{QuizAnswerEvaluating,QuizAnswerEvaluated};
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -49,5 +48,10 @@ final class QuizAnswer extends Model
     public function scopeOnQuiz(\Illuminate\Database\Eloquent\Builder $query, int $quizId)
     {
         $query->where('quiz_id', $quizId);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }
