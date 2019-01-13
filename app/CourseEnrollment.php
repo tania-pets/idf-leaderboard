@@ -33,6 +33,15 @@ final class CourseEnrollment extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function scopeOfUser(\Illuminate\Database\Eloquent\Builder $query, \App\User $user)
+    {
+        return $query->where('user_id', $user->id);
+    }
+
+    public function scopeOnCourse(\Illuminate\Database\Eloquent\Builder $query, \App\Course $course)
+    {
+        return $query->where('course_id', $course->id);
+    }
     /**
      * Calculates the score that user has achieved in this enrollment's course quizzes in total
      * @return    int

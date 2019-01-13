@@ -23,9 +23,6 @@ Class QuizAnswerEvaluated implements ShouldQueue
  {
      $quizAnswer = $event->getQuizAnswer();
      $course = $quizAnswer->quiz->lesson->course;
-
-     Log::info('CCC ' .$quizAnswer->quiz->lesson->course->id);
-
      dispatch(new UpdateCourseScoreForUser($course, $quizAnswer->user));
  }
 
