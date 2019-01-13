@@ -17,6 +17,13 @@ trait CreatesApplication
 
         $app->make(Kernel::class)->bootstrap();
 
+        //check for traits and execute what's needed
+        $uses = array_flip(class_uses_recursive(static::class));
+        //create the test database with countries seeded
+        if (isset($uses[UseDatabase::class])) {
+            $this->createDatabase(true, ['\CountriesSeeder']);
+        }
+
         return $app;
     }
 }

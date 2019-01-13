@@ -29,5 +29,9 @@
         <env name="MAIL_DRIVER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="DB_PORT" value="3306" />
+        <env name="DB_HOST" value="idf-mysql-test" />
+
+
     </php>
 </phpunit>
