@@ -94,3 +94,5 @@ services:
   redis:
     image: redis
     container_name: idf-redis
+    volumes_from:
+      - data
