@@ -1,7 +1,7 @@
 # Welcome to the IDF Back-End Code Challenge!
 
 This is a redis based leaderBoard implementation utilizing sorted sets.
-Please update your .env with REDIS_HOST (copy .env.*.example)
+Please update your .env with REDIS_HOST (copy `.env.*.example`)
 
 When a grader evaluates an answer, a job is added to a queue in order to recalculate and update the user's score to redis.
 The score is saved to mysql as well, but it's not used right now.
@@ -12,16 +12,19 @@ The architecture is flexible and makes the storage engine switch easy in the fut
 
 You can find most of the code under ```app\LeaderBoard``` namcespace.
 
+This is not a production ready implementation but i think it gives you a general idea for my coding.
+
 ## Instructions
 
  - Install the app as described on your README.
- - Copy the updated .env.*.example to .env
+ - Copy the updated `.env.*.example` to `.env`
  - Execute ``` php artisan leaderboard:seedcoursescores``` in order to fill the leaderboard with the scores calculated from seed's data.
 
 
 ## Unit Tests
 
 The time wasn't enough for me and i added only 2 tests as a sample : (
+
 Execute with: ```./vendor/bin/phpunit```
 A mysql test connection is added to docker-compose for tests.
 
