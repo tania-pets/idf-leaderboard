@@ -104,7 +104,7 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
         $shownBelowcount = LeaderBoardEngine::getConf('below_me_shown');
 
         //get before
-        $beforeMe =  $this->redis->zRangeByScore($this->set, $score+1, "+inf",  ['WITHSCORES' => $withScores, "LIMIT" => [ "OFFSET" => 0, "COUNT" => 1]] );
+        $beforeMe =  $this->redis->zRangeByScore($this->set, $score+1, "+inf",  ['WITHSCORES' => $withScores, "LIMIT" => [ "OFFSET" => 0, "COUNT" => $shownAboveCount]] );
 
         //get me
         $me = [];
@@ -123,7 +123,6 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
             $i++;
         }
         unset($afterMeAll);
-
         return  $beforeMe +  $me + $afterMe;
     }
 
