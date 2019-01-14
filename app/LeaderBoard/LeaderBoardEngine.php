@@ -31,7 +31,7 @@ Class LeaderBoardEngine
      * Construct the list of the leaderboard
      *
      */
-    public function getLeaderBoardList()
+    public function getLeaderBoardList(): array
     {
         $leaders = $this->formatUsers($this->lb_storage->getLeaders());
         $loosers = $this->formatUsers($this->lb_storage->getLoosers());
@@ -98,7 +98,7 @@ Class LeaderBoardEngine
                     $key = array_search($prevItem['user_id'], array_column($data, 'user_id'));
                     $data[$key]['rank']--;
                 }
-            }        
+            }
             $item = ['user_id' => $userId, 'score' => $score, 'rank' => $rank + 1 ];
             $data[] = $item;
             $prevItem = $item;

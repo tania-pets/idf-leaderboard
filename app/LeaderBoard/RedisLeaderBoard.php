@@ -11,7 +11,7 @@ namespace App\LeaderBoard;
 use Redis;
 use App\{User, Course};
 use App\LeaderBoard\{LeaderBoardList, LeaderBoardItem};
-
+use Log;
 final class RedisLeaderBoard implements LeaderBoardStorageInterface
 {
 
@@ -26,6 +26,8 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
     {
         $this->redis = Redis::connection();
     }
+
+
     /**
      * Returns a list with the leaders (count taken from conf)
      * @param bollean $withScores if we need the scores alogn with the user ids
@@ -52,6 +54,11 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
      */
     public function getRank(int $userId): int
     {
+        if (!$this->redis->exists($this->set)) {
+            $msg = "LeaderBoard seems empty.Execute php artisan leaderboard:seedcoursescores to seed the data";
+            Log::info($msg);
+            throw new \Exception($msg);
+        }
         return $this->redis->zRevRank($this->set, $userId);
     }
 
