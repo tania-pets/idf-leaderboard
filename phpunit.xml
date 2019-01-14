@@ -31,6 +31,8 @@
         <env name="SESSION_DRIVER" value="array"/>
         <env name="DB_PORT" value="3306" />
         <env name="DB_HOST" value="idf-mysql-test" />
+        <env name="REDIS_DB" value="1" />
+
 
 
     </php>

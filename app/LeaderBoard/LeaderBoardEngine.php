@@ -8,12 +8,11 @@ namespace App\LeaderBoard;
  */
 
 use App\{User, Course};
-
 Class LeaderBoardEngine
 {
     private $lb_storage;
 
-    const LEADERBOARD_TYPES = ['country', 'global'];
+    const LEADERBOARD_TYPES = [  'country', 'global'];
     /**
      * For flexibility purpose, the class accepts LeaderBoardStorageInterface object
      * Right now it's on redis but it can easily be implemented with different storage
@@ -32,63 +31,20 @@ Class LeaderBoardEngine
      * Construct the list of the leaderboard
      *
      */
-    public function getLeaderBoardList(): array
+    public function getLeaderBoardList()
     {
-        $leaders = $this->lb_storage->getLeaders();
-        $loosers = $this->lb_storage->getLoosers();
-        $leadersAndLoosers = $leaders + $loosers;
-
-
-        //i have both leaders and loosers in a list, let's see where am i
-        $userId = $this->lb_storage->getUser()->id;
-        $myPosition = array_search($userId, array_keys($leadersAndLoosers));
-
-        //i i am in leaders or loosers first move me upper if any equal users
-        if ($myPosition) {
-            $myScore = $leadersAndLoosers[$userId];
-            $this->moveMeUpperFromEquals($leadersAndLoosers, $myScore, $userId);
-        }
-
-        //if i am last of the leaders, or first of the loosers, or i am not a leader or a looser, then i need to fetch others arround me
-        $lastOfLeadersPosition = self::getConf('leaders_shown') - 1;
-        $firstOfLoossersPosition = self::getConf('leaders_shown');
-
-        if (in_array($myPosition, [$lastOfLeadersPosition, $firstOfLoossersPosition, false])) {
-            $arroundMe = $this->lb_storage->arroundMe();
-            $leadersAndLoosers = $leaders + $arroundMe + $loosers;
-        }
-
-        //move me upper from equals
-        $myScore = $leadersAndLoosers[$userId];
-        $this->moveMeUpperFromEquals($leadersAndLoosers, $myScore, $userId);
-
-        return $this->withRanks($leadersAndLoosers);
+        $leaders = $this->formatUsers($this->lb_storage->getLeaders());
+        $loosers = $this->formatUsers($this->lb_storage->getLoosers());
+        $arroundMe = $this->formatUsers($this->lb_storage->arroundMe());
+        $users = array_merge($leaders, $loosers, $arroundMe);
+        usort($users, function($el1, $el2){
+            return $el1['score'] < $el2['score'];
+        });
+        $users = collect($users);
+        return $users->keyBy('user_id')->toArray();
     }
 
-    private function withRanks($leadersAndLoosers)
-    {
-        foreach ($leadersAndLoosers as $userId => $score)
-        {
-            $leadersAndLoosers[$userId] = ['score' => $score, 'rank' => $this->lb_storage->getRank($userId) + 1];
-        }
-        return $leadersAndLoosers;
-    }
 
-    /**
-     * If same score with other users, i must be shown upper
-     * @return    void
-     */
-    private function moveMeUpperFromEquals(array &$leadersAndLoosers, string $myScore, int $userId) : void
-    {
-        $moveMeUp = function($k1, $k2) use ($myScore, $leadersAndLoosers, $userId) {
-            $score1 = $leadersAndLoosers[$k1];
-            $score2 = $leadersAndLoosers[$k2];
-            if ((($score2 == $score1) && ($score1 == $myScore)) && $k2==$userId) {
-                return 1;
-            }
-        };
-        uksort($leadersAndLoosers, $moveMeUp);
-    }
     /**
      * Sets the score for given user
      * @param in $score
@@ -126,4 +82,27 @@ Class LeaderBoardEngine
     }
 
 
+    /**
+     * Formats the data for the lists
+     * @param array $users
+     */
+    private function formatUsers(array $users) : array
+    {
+        $data = [];
+        $i = 0;
+        foreach($users as $userId => $score) {
+            $rank = $this->lb_storage->getRank($userId);
+            //fix ranks after swapping (equals case)
+            if (isset($prevItem) && ($prevItem['score'] == $score)) {
+                if ($prevItem['rank'] > $rank) {
+                    $key = array_search($prevItem['user_id'], array_column($data, 'user_id'));
+                    $data[$key]['rank']--;
+                }
+            }        
+            $item = ['user_id' => $userId, 'score' => $score, 'rank' => $rank + 1 ];
+            $data[] = $item;
+            $prevItem = $item;
+        }
+        return $data;
+    }
 }

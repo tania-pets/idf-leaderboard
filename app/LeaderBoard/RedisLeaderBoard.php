@@ -10,6 +10,7 @@ namespace App\LeaderBoard;
 
 use Redis;
 use App\{User, Course};
+use App\LeaderBoard\{LeaderBoardList, LeaderBoardItem};
 
 final class RedisLeaderBoard implements LeaderBoardStorageInterface
 {
@@ -25,7 +26,6 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
     {
         $this->redis = Redis::connection();
     }
-
     /**
      * Returns a list with the leaders (count taken from conf)
      * @param bollean $withScores if we need the scores alogn with the user ids
@@ -56,6 +56,16 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
     }
 
     /**
+     * Returns the score for given user
+     * @return    int
+     */
+    public function getScore(int $userId): string
+    {
+        return $this->redis->zScore($this->set, $userId);
+    }
+
+
+    /**
      * Sets the score for the user
      * @param int $score
      * @return    void
@@ -82,7 +92,32 @@ final class RedisLeaderBoard implements LeaderBoardStorageInterface
     public function arroundUser(int $userId, bool $withScores = true): array
     {
         $rank = (int)$this->getRank($this->user->id);
-        return $this->redis->zRevRange($this->set, $rank - LeaderBoardEngine::getConf('above_me_shown'), $rank + LeaderBoardEngine::getConf('below_me_shown'), ['WITHSCORES' => $withScores]);
+        $score = $this->getScore($this->user->id);
+        $shownAboveCount = LeaderBoardEngine::getConf('above_me_shown');
+        $shownBelowcount = LeaderBoardEngine::getConf('below_me_shown');
+
+        //get before
+        $beforeMe =  $this->redis->zRangeByScore($this->set, $score+1, "+inf",  ['WITHSCORES' => $withScores, "LIMIT" => [ "OFFSET" => 0, "COUNT" => 1]] );
+
+        //get me
+        $me = [];
+        $me[$this->user->id] =  $score;
+
+        //get after
+        $afterMeAll = $this->redis->zRevRangeByScore($this->set, $score, 0, ['WITHSCORES' => $withScores]);
+
+        unset($afterMeAll[$userId]);
+        $i = 0;
+        $afterMe = [];
+        foreach ($afterMeAll as $id => $a) {
+            if ($i < $shownBelowcount) {
+                $afterMe[$id] = $a;
+            }
+            $i++;
+        }
+        unset($afterMeAll);
+
+        return  $beforeMe +  $me + $afterMe;
     }
 
     public function setType(string $type = null): LeaderBoardStorageInterface

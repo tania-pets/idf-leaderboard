@@ -42,8 +42,14 @@
                                     <ul style="padding: 0px;">
 
                                     @foreach ($lbUsers as $lbUserId => $lbInfo)
-                                        <?php if((isset($prevRank) &&  $lbInfo['rank'] - $prevRank > 1) ||  ( isset($prevRank) && ($lbInfo['rank'] - $prevRank ==1) &&  $lbInfo['rank'] == \App\LeaderBoard\LeaderBoardEngine::getConf('leaders_shown') + 1))
-                                            echo '<hr>';
+                                        <?php
+                                            //draw hr for section if previous user has more than 1 difference from me OR i am the first looser
+                                            $firstLoosersPosition = count($lbUsers) - \App\LeaderBoard\LeaderBoardEngine::getConf('leaders_shown');
+                                            if (isset($prevRank)) {
+                                                if ( $lbInfo['rank'] - $prevRank > 1 || ($lbInfo['rank'] - $prevRank == 1 &&  $loop->iteration -1 == $firstLoosersPosition)) {
+                                                    echo '<hr>';
+                                                }
+                                            }
                                         ?>
                                         <li class="courseRanking__rankItem"
                                             style="display: flex; flex-direction: row; padding: 10px;">
@@ -53,6 +59,8 @@
                                             </div>
                                             <div class="info">
                                                 <div style="font-size: 16px;">
+                                                    <b>{{$leaderBoardUserData[$lbUserId][0]->id}}</b>
+
                                                     @if($lbUserId == $me->id)
                                                         <b>{{$leaderBoardUserData[$lbUserId][0]->name}}</b>
                                                     @else
