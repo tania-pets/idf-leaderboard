@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use App\LeaderBoard\{LeaderBoardFactory, LeaderBoardEngine};
 /**
  * @property int $id
  * @property int $user_id
@@ -54,5 +54,22 @@ final class CourseEnrollment extends Model
             });
         })->get();
         return $answersGiven->count() ? $answersGiven->sum('score') : 0;
+    }
+
+    /**
+     * Calculates the score of a user for this enrollment's course and stores to leaderboard storage
+     */
+    public function storeUserScoreToLeaderBoard(): void
+    {
+        $score = $this->calculateScore();
+        $leaderBoardTypes = LeaderBoardEngine::LEADERBOARD_TYPES; //country, global
+        //update sorted sets both global and country
+        foreach ($leaderBoardTypes as $lbType) {
+            $leaderBoard = LeaderBoardFactory::makeLeaderBoard($this->user, $this->course, $lbType);
+            $leaderBoard->storeScore($score);
+        }
+        //save score in db for backup - not used
+        $this->score = $score;
+        $this->save();
     }
 }
