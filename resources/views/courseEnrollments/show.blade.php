@@ -59,8 +59,6 @@
                                             </div>
                                             <div class="info">
                                                 <div style="font-size: 16px;">
-                                                    <b>{{$leaderBoardUserData[$lbUserId][0]->id}}</b>
-
                                                     @if($lbUserId == $me->id)
                                                         <b>{{$leaderBoardUserData[$lbUserId][0]->name}}</b>
                                                     @else
