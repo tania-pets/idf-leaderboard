@@ -24,6 +24,8 @@ cp .env.docker.example .env
 docker-compose up -d
 # install composer dependencies 	
 docker-compose exec workspace composer install
+# generate app key
+docker-compose exec workspace php artisan key:generate
 # Run all migrations and seed the DB
 docker-compose exec workspace php artisan migrate:fresh --seed
 # Seed the redis with leaderboard data

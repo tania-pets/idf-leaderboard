@@ -29,7 +29,7 @@ class QuizAnswersSeeder extends Seeder
     public function run()
     {
         for ($i = 0; $i < self::NUMBER_OF_USERS; $i++) {
-            $user = factory(User::class)->create(['country_id' => $this->countryIds->random()]);
+            $user = factory(User::class)->create(['country_id' => $this->countryIds->random(), 'email' => 'demo@demo'. $i . '.com']);
             $this->enrolInCoursesAndGenerateAnswers($user, random_int(0, $this->courseIds->count()));
         }
     }
