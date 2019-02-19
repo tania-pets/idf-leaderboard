@@ -32,7 +32,7 @@ docker-compose exec workspace php artisan migrate:fresh --seed
 docker-compose exec workspace php artisan leaderboard:seedcoursescores
 ```
 You should be able to access the project at [http://localhost:8880](http://localhost:8880).
-
+Login as demo@demo1.com, pass: secret
 
 ## Unit Tests
 
